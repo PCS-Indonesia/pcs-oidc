@@ -1,4 +1,4 @@
-module pcs-oidc
+module github.com/PCS-Indonesia/pcs-oidc
 
 go 1.23.0
 
