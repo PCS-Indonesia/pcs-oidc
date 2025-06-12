@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	gcpwif "module github.com/PCS-Indonesia/pcs-oidc/oidc/google"
+	gcpwif "pcs-oidc/oidc/google"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/require"
