@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	oidc "2506-pcs-oidc-external-access-go/oidc/provider"
+	oidc "pcs-oidc/oidc/provider"
 
 	"github.com/stretchr/testify/require"
 )

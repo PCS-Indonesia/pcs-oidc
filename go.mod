@@ -1,4 +1,4 @@
-module 2506-pcs-oidc-external-access-go
+module pcs-oidc
 
 go 1.23.0
 

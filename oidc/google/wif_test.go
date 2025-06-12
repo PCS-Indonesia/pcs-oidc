@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	gcpwif "2506-pcs-oidc-external-access-go/oidc/google"
+	gcpwif "pcs-oidc/oidc/google"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/require"
