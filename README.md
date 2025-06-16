@@ -52,16 +52,16 @@ Or clone this repository and use as a local module.
 
 ### Google WIF Example
 ```go
-cfg := NewWIFConfig(
-    "audience",
-    "subjectTokenType",
-    "tokenURL",
-    []string{"scope1", "scope2"},
-    "serviceAccountImpersonationURL",
-    &StaticTokenSupplier{Token: "your-oidc-token"},
-)
+cfg := WIFConfig{
+    Audience: "audience",
+    SubjectTokenType: "subjectTokenType",
+    TokenURL: "tokenURL",
+    Scopes: []string{"scope1", "scope2"},
+    ServiceAccountImpersonationURL: "serviceAccountImpersonationURL",
+    TokenSupplier: &StaticTokenSupplier{Token: "your-oidc-token"},
+}
 
-baseTS, err := GetGCPTokenSource(context.Background(), cfg)
+baseTS, err := cfg.GetTokenSource(context.Background())
 if err != nil {
     // handle error
 }
@@ -158,7 +158,7 @@ For integration tests that require environment variables, copy `.env.example` to
 ---
 
 ## Version
-- Initial Release: v0.1.0 (June 2025)
+- v0.2.0 (June 2025) — Update: idiomatic struct usage, improved docs, and test consistency
 - Status: Beta, API may change before v1.0.0
 
 ---
@@ -174,7 +174,7 @@ For integration tests that require environment variables, copy `.env.example` to
 
 **Author:**
 - [Alfarizi] [Aditya]
-- [Tanggal: 2025-06-11]
+- [Tanggal: 2025-06-16]
 
 
 ## License

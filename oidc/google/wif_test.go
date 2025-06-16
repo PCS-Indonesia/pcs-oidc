@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	gcpwif "pcs-oidc/oidc/google"
+	gcpwif "github.com/PCS-Indonesia/pcs-oidc/oidc/google"
 
 	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/require"
@@ -30,15 +30,15 @@ func TestGetGCPTokenSource(t *testing.T) {
 	validToken := "YOUR_TOKEN_ACCESS" // JWT with exp in the far future
 	t.Run("success with valid static token", func(t *testing.T) {
 		supplier := &gcpwif.StaticTokenSupplier{Token: validToken}
-		cfg := gcpwif.NewWIFConfig(
-			"YOUR_AUDIENCE",            // Change to your audience
-			"YOUR_SUBJECT_TOKEN_TYPE",  // Change to your subject token type
-			"YOUR_TOKEN_URL",           // Change to your token URL
-			[]string{"YOUR_SCOPES"},    // Change to your scopes
-			"YOUR_SERVICE_ACCOUNT_URL", // Change to your service account URL
-			supplier,
-		)
-		ts, err := gcpwif.GetGCPTokenSource(ctx, cfg)
+		cfg := gcpwif.WIFConfig{
+			Audience:                       "YOUR_AUDIENCE",            // Change to your audience
+			SubjectTokenType:               "YOUR_SUBJECT_TOKEN_TYPE",  // Change to your subject token type
+			TokenURL:                       "YOUR_TOKEN_URL",           // Change to your token URL
+			Scopes:                         []string{"YOUR_SCOPES"},    // Change to your scopes
+			ServiceAccountImpersonationURL: "YOUR_SERVICE_ACCOUNT_URL", // Change to your service account URL
+			TokenSupplier:                  supplier,
+		}
+		ts, err := cfg.GetTokenSource(ctx)
 		require.NoError(t, err)
 		require.NotNil(t, ts)
 
@@ -60,15 +60,15 @@ func TestGetGCPTokenSource(t *testing.T) {
 
 	t.Run("error if token supplier returns error", func(t *testing.T) {
 		supplier := &dummyTokenSupplier{err: errors.New("token error")}
-		cfg := gcpwif.NewWIFConfig(
-			"YOUR_AUDIENCE",            // Change to your audience
-			"YOUR_SUBJECT_TOKEN_TYPE",  // Change to your subject token type
-			"YOUR_TOKEN_URL",           // Change to your token URL
-			[]string{"YOUR_SCOPES"},    // Change to your scopes
-			"YOUR_SERVICE_ACCOUNT_URL", // Change to your service account URL
-			supplier,
-		)
-		ts, err := gcpwif.GetGCPTokenSource(ctx, cfg)
+		cfg := gcpwif.WIFConfig{
+			Audience:                       "YOUR_AUDIENCE",
+			SubjectTokenType:               "YOUR_SUBJECT_TOKEN_TYPE",
+			TokenURL:                       "YOUR_TOKEN_URL",
+			Scopes:                         []string{"YOUR_SCOPES"},
+			ServiceAccountImpersonationURL: "YOUR_SERVICE_ACCOUNT_URL",
+			TokenSupplier:                  supplier,
+		}
+		ts, err := cfg.GetTokenSource(ctx)
 		require.NoError(t, err)
 		require.NotNil(t, ts)
 		_, err = ts.Token()
@@ -78,13 +78,13 @@ func TestGetGCPTokenSource(t *testing.T) {
 	t.Run("error if config missing required fields", func(t *testing.T) {
 		supplier := &gcpwif.StaticTokenSupplier{Token: validToken}
 		cfg := gcpwif.WIFConfig{
-			Audience:         "",
-			SubjectTokenType: "",
-			TokenURL:         "",
+			Audience:         "YOUR_AUDIENCE",
+			SubjectTokenType: "YOUR_SUBJECT_TOKEN_TYPE",
+			TokenURL:         "YOUR_TOKEN_URL",
 			Scopes:           nil,
 			TokenSupplier:    supplier,
 		}
-		ts, err := gcpwif.GetGCPTokenSource(ctx, cfg)
+		ts, err := cfg.GetTokenSource(ctx)
 		require.Error(t, err)
 		require.Nil(t, ts)
 	})
@@ -95,22 +95,22 @@ func TestMultipleWIFTokensAreValidForPubSub(t *testing.T) {
 	validToken := "YOUR_TOKEN_ACCESS" // JWT with exp in the far future, ganti dengan token valid
 
 	supplier := &gcpwif.StaticTokenSupplier{Token: validToken}
-	cfg := gcpwif.NewWIFConfig(
-		"YOUR_AUDIENCE",            // Change to your audience
-		"YOUR_SUBJECT_TOKEN_TYPE",  // Change to your subject token type
-		"YOUR_TOKEN_URL",           // Change to your token URL
-		[]string{"YOUR_SCOPES"},    // Change to your scopes
-		"YOUR_SERVICE_ACCOUNT_URL", // Change to your service account URL
-		supplier,
-	)
+	cfg := gcpwif.WIFConfig{
+		Audience:                       "YOUR_AUDIENCE",            // Change to your audience
+		SubjectTokenType:               "YOUR_SUBJECT_TOKEN_TYPE",  // Change to your subject token type
+		TokenURL:                       "YOUR_TOKEN_URL",           // Change to your token URL
+		Scopes:                         []string{"YOUR_SCOPES"},    // Change to your scopes
+		ServiceAccountImpersonationURL: "YOUR_SERVICE_ACCOUNT_URL", // Change to your service account URL
+		TokenSupplier:                  supplier,
+	}
 
-	ts1, err := gcpwif.GetGCPTokenSource(ctx, cfg)
+	ts1, err := cfg.GetTokenSource(ctx)
 	require.NoError(t, err)
 	token1, err := ts1.Token()
 	require.NoError(t, err)
 	require.NotEmpty(t, token1.AccessToken)
 
-	ts2, err := gcpwif.GetGCPTokenSource(ctx, cfg)
+	ts2, err := cfg.GetTokenSource(ctx)
 	require.NoError(t, err)
 	token2, err := ts2.Token()
 	require.NoError(t, err)

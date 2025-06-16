@@ -11,19 +11,19 @@ Paket ini menyediakan utilitas untuk mengelola OIDC token source pada skenario G
 
 ### 1. Inisialisasi WIFConfig
 ```go
-cfg := NewWIFConfig(
-    "audience",
-    "subjectTokenType",
-    "tokenURL",
-    []string{"scope1", "scope2"},
-    "serviceAccountImpersonationURL",
-    &StaticTokenSupplier{Token: "your-oidc-token"},
-)
+cfg := WIFConfig{
+    Audience: "audience",
+    SubjectTokenType: "subjectTokenType",
+    TokenURL: "tokenURL",
+    Scopes: []string{"scope1", "scope2"},
+    ServiceAccountImpersonationURL: "serviceAccountImpersonationURL",
+    TokenSupplier: &StaticTokenSupplier{Token: "your-oidc-token"},
+}
 ```
 
 ### 2. Buat TokenSource dasar
 ```go
-baseTS, err := GetGCPTokenSource(context.Background(), cfg)
+baseTS, err := cfg.GetTokenSource(context.Background())
 if err != nil {
     // handle error
 }
