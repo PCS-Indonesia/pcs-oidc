@@ -36,22 +36,15 @@ type WIFConfig struct {
 	TokenSupplier                  TokenSupplier
 }
 
-// NewWIFConfig is a constructor for WIFConfig with all parameters required (no hardcoded defaults).
-func NewWIFConfig(audience, subjectTokenType, tokenURL string, scopes []string, saImpersonationURL string, tokenSupplier TokenSupplier) WIFConfig {
-	return WIFConfig{
-		Audience:                       audience,
-		SubjectTokenType:               subjectTokenType,
-		TokenURL:                       tokenURL,
-		Scopes:                         scopes,
-		ServiceAccountImpersonationURL: saImpersonationURL,
-		TokenSupplier:                  tokenSupplier,
-	}
+// NewWIFConfig is an identity constructor for WIFConfig (optional, can use struct literal directly).
+func NewWIFConfig(cfg WIFConfig) WIFConfig {
+	return cfg
 }
 
-// GetGCPTokenSource returns an oauth2.TokenSource for GCP using Workload Identity Federation.
-// This function is flexible: you can supply any TokenSupplier (static or dynamic).
+// GetTokenSource returns an oauth2.TokenSource for GCP using Workload Identity Federation.
+// This method is flexible: you can supply any TokenSupplier (static or dynamic).
 // Best practice: validate config, wrap with ReuseTokenSourceWithExpiry, and allow leeway config.
-func GetGCPTokenSource(ctx context.Context, cfg WIFConfig, leeway ...time.Duration) (oauth2.TokenSource, error) {
+func (cfg WIFConfig) GetTokenSource(ctx context.Context, leeway ...time.Duration) (oauth2.TokenSource, error) {
 	// Validate required fields
 	if cfg.Audience == "" || cfg.SubjectTokenType == "" || cfg.TokenURL == "" || cfg.TokenSupplier == nil {
 		return nil, fmt.Errorf("missing required WIFConfig fields")
